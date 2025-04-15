@@ -7,28 +7,3 @@
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
   <p align="center">Microservicio autenticacion con Spring security 6 y JWT en JAVA 17 con Spring Boot</p>
-
-
-## Contact
-## Installation
-
-```bash
-$ mvn install
-```
-
-## Running the app
-
-run app
-
-```
-
-## Test
-
-```bash
-# unit tests
-$ $ mvn test
-
-```
-## License
-
-##By [Neiser Custodio](https://instagram.com/neisercode).
