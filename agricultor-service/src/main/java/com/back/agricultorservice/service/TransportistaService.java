@@ -1,34 +1,22 @@
 package com.back.agricultorservice.service;
 
-import com.back.agricultorservice.dto.SolicitudResponse;
 import com.back.agricultorservice.dto.TransportistaRequest;
 import com.back.agricultorservice.dto.TransportistaResponse;
-import com.back.agricultorservice.model.SolicitudModel;
-import com.back.agricultorservice.model.TblAgricultorModel;
 import com.back.agricultorservice.model.TransportistaModel;
-import com.back.agricultorservice.repository.TblAgricultorRepository;
 import com.back.agricultorservice.repository.TransportistaRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TransportistaService {
     private final TransportistaRepository transportistaRepository;
-    private final TblAgricultorRepository tblAgricultorRepository;
     @Transactional
     public TransportistaResponse crearTransportista(TransportistaRequest request, String usuarioCreacion){
-
-        //Validar si existe el agricultor antes de guardar.
-        TblAgricultorModel agricultor = tblAgricultorRepository.findById(request.getNitAgricultor())
-                .orElseThrow(() -> new IllegalArgumentException("Agricultor no encontrado con NIT: " + request.getNitAgricultor()));
         //Validar que no se registren CUI duplicados de transportistaas
         transportistaRepository.findById(request.getCuiTransportista()).ifPresent(existing -> {
             if (existing.isActivo()) {
@@ -40,7 +28,7 @@ public class TransportistaService {
         //Crear el transportista
         TransportistaModel transportista = new TransportistaModel();
         transportista.setCuiTransportista(request.getCuiTransportista());
-        transportista.setAgricultor(agricultor);
+        transportista.setNitAgricultor(request.getNitAgricultor());
         transportista.setNombreCompleto(request.getNombreCompleto());
         transportista.setFechaNacimiento(request.getFechaNacimiento());
         transportista.setTipoLicencia(request.getTipoLicencia());
@@ -55,7 +43,7 @@ public class TransportistaService {
     private TransportistaResponse convertirATransportistaResponse(TransportistaModel transportista) {
         TransportistaResponse response = new TransportistaResponse();
         response.setCuiTransportista(transportista.getCuiTransportista());
-        response.setNitAgricultor(transportista.getAgricultor().getNitAgricultor());
+        response.setNitAgricultor(transportista.getNitAgricultor());
         response.setNombreCompleto(transportista.getNombreCompleto());
         response.setFechaNacimiento(transportista.getFechaNacimiento());
         response.setTipoLicencia(transportista.getTipoLicencia());

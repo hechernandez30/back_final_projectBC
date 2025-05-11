@@ -14,8 +14,7 @@ public class MedidaPesoController {
     private final MedidaPesoService medidaPesoService;
 
     @PostMapping
-    public ResponseEntity<MedidaPesoResponse> crearMedidaPeso(@RequestBody MedidaPesoRequest request,
-                                                              @RequestHeader("X-Usuario") String usuarioCreacion) {
+    public ResponseEntity<MedidaPesoResponse> crearMedidaPeso(@RequestBody MedidaPesoRequest request, @RequestHeader("X-Usuario") String usuarioCreacion) {
         return ResponseEntity.ok(medidaPesoService.crearMedidaPeso(request, usuarioCreacion));
     }
 

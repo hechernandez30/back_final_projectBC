@@ -14,9 +14,8 @@ public class TransporteModel {
     @Column(name = "PlacaTransporte")
     private String placaTransporte;
 
-    @ManyToOne
-    @JoinColumn(name = "NitAgricultor")
-    private TblAgricultorModel agricultor;
+    @Column(name = "NitAgricultor")
+    private String nitAgricultor;
 
     @Column(name = "TipoPlaca", nullable = false)
     private String TipoPlaca;

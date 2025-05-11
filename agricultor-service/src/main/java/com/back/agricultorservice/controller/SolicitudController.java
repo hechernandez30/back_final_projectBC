@@ -15,10 +15,10 @@ import java.util.List;
 @RequestMapping("/api/solicitudes")
 @RequiredArgsConstructor
 public class SolicitudController {
-    private final SolicitudService solicitudService;
+   private final SolicitudService solicitudService;
 
     @PostMapping
-    public ResponseEntity<SolicitudResponse> crearSolicitud(@Valid @RequestBody SolicitudRequest request, @RequestHeader("X-Usuario") String usuarioCreacion) {
+    public ResponseEntity<SolicitudResponse> crearSolicitud(@RequestBody SolicitudRequest request, @RequestHeader("X-Usuario") String usuarioCreacion) {
         SolicitudResponse response = solicitudService.crearSolicitud(request, usuarioCreacion);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

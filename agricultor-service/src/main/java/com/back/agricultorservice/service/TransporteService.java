@@ -2,9 +2,7 @@ package com.back.agricultorservice.service;
 
 import com.back.agricultorservice.dto.TransporteRequest;
 import com.back.agricultorservice.dto.TransporteResponse;
-import com.back.agricultorservice.model.TblAgricultorModel;
 import com.back.agricultorservice.model.TransporteModel;
-import com.back.agricultorservice.repository.TblAgricultorRepository;
 import com.back.agricultorservice.repository.TransporteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransporteService {
     private final TransporteRepository transporteRepository;
-    private final TblAgricultorRepository agricultorRepository;
 
     public TransporteResponse crearTransporte(TransporteRequest request, String usuarioCreacion) {
         //Validar existencia por placa, para evitar registros duplicados en la BD
@@ -26,12 +23,10 @@ public class TransporteService {
         if (existente.isPresent()) {
             throw new IllegalArgumentException("Ya existe un transporte con esa placa.");
         }
-        TblAgricultorModel agricultor = agricultorRepository.findById(request.getNitAgricultor())
-                .orElseThrow(() -> new IllegalArgumentException("Agricultor no encontrado."));
 
         TransporteModel transporte = new TransporteModel();
         transporte.setPlacaTransporte(request.getPlacaTransporte());
-        transporte.setAgricultor(agricultor);
+        transporte.setNitAgricultor(request.getNitAgricultor());
         transporte.setTipoPlaca(request.getTipoPlaca());
         transporte.setMarca(request.getMarca());
         transporte.setColor(request.getColor());
@@ -46,15 +41,13 @@ public class TransporteService {
     }
 
     public TransporteResponse actualizarTransporte(String placa, TransporteRequest request, String usuarioModificacion) {
-        TblAgricultorModel agricultor = agricultorRepository.findById(request.getNitAgricultor())
-                .orElseThrow(() -> new IllegalArgumentException("Agricultor no encontrado."));
         TransporteModel transporte = transporteRepository.findById(placa)
                 .orElseThrow(() -> new IllegalArgumentException("Transporte no encontrado"));
         if (!transporte.isActivo()) {
             throw new IllegalArgumentException("No se puede modificar un trasnporte inactivo.");
         }
 
-        transporte.setAgricultor(agricultor);
+        transporte.setNitAgricultor(request.getNitAgricultor());
         transporte.setTipoPlaca(request.getTipoPlaca());
         transporte.setMarca(request.getMarca());
         transporte.setColor(request.getColor());
@@ -84,7 +77,7 @@ public class TransporteService {
     private TransporteResponse convertirAResponse(TransporteModel t) {
         TransporteResponse response = new TransporteResponse();
         response.setPlacaTransporte(t.getPlacaTransporte());
-        response.setNitAgricultor(t.getAgricultor().getNitAgricultor());
+        response.setNitAgricultor(t.getNitAgricultor());
         response.setTipoPlaca(t.getTipoPlaca());
         response.setMarca(t.getMarca());
         response.setColor(t.getColor());

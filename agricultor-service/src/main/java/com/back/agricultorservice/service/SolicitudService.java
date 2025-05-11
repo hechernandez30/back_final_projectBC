@@ -16,49 +16,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SolicitudService {
     private final SolicitudRepository solicitudRepository;
-    private final TblAgricultorRepository agricultorRepository;
     private final TransporteRepository transporteRepository;
     private final TransportistaRepository transportistaRepository;
     private final MedidaPesoRepository medidaPesoRepository;
 
     @Transactional
     public SolicitudResponse crearSolicitud(SolicitudRequest request, String usuarioCreacion) {
-        //1. Validar agricultor activo
-        TblAgricultorModel agricultor = agricultorRepository.findById(request.getNitAgricultor())
-                .orElseThrow(() -> new IllegalArgumentException("Agricultor no encontrado con NIT: " + request.getNitAgricultor()));
-        if (!agricultor.isActivo()) {
-           throw new IllegalArgumentException("El agricultor no esta activo");
-        }
-        //2. Validar transporte activo y perteneciente al agricultor
-        TransporteModel transporte = transporteRepository.findById(request.getPlacaTransporte())
-                .orElseThrow(() -> new IllegalArgumentException("Transporte no encontrado con placca: " + request.getPlacaTransporte()));
-        if (!transporte.isActivo()) {
-            throw new IllegalArgumentException("El transporte está inactivo");
-        }
-        if (!transporte.getAgricultor().getNitAgricultor().equals(agricultor.getNitAgricultor())) {
-            throw new IllegalArgumentException("El transporte no pertenece al agricultor");
-        }
-        //3. Validar transportista activo y perteneciente al agricultor
-        TransportistaModel transportista = transportistaRepository.findById(request.getCuiTransportista())
-                .orElseThrow(() -> new IllegalArgumentException("Transportista no encontrado con CUI: " + request.getCuiTransportista()));
-        if (!transportista.isActivo()) {
-            throw new IllegalArgumentException("El transportista está inactivo");
-        }
-        if (!transportista.getAgricultor().getNitAgricultor().equals(agricultor.getNitAgricultor())) {
-            throw new IllegalArgumentException("El transportista no pertenece al agricultor");
-        }
-        //4. Validar medida de peso
+        //2. Validar medida de peso
         MedidaPesoModel medidaPeso = medidaPesoRepository.findById(request.getMedidaPesoId())
                 .orElseThrow(() -> new IllegalArgumentException("Medida de peso no encontrada con ID: " + request.getMedidaPesoId()));
-//        // 5. Validar coherencia de pesos (opcional)
+        //3. Validar coherencia de pesos (opcional)
         if (request.getPesoAcordado() != (request.getCantParcialidades() * request.getPesoCadaParcialidad())) {
             throw new IllegalArgumentException("El peso acordado no coincide con el cálculo de parcialidades");
         }
-        // 6. Crear y guardar la solicitud
+        //4. Crear y guardar la solicitud
         SolicitudModel solicitud = new SolicitudModel();
-        solicitud.setAgricultor(agricultor);
-        solicitud.setTransporte(transporte);
-        solicitud.setTransportista(transportista);
+        solicitud.setNumeroCuenta(request.getNumeroCuenta());
+        solicitud.setNitAgricultor(request.getNitAgricultor());
         solicitud.setMedidaPeso(medidaPeso);
         solicitud.setPesoAcordado(request.getPesoAcordado());
         solicitud.setCantParcialidades(request.getCantParcialidades());
@@ -88,12 +62,8 @@ public class SolicitudService {
     private SolicitudResponse convertirASolicitudResponse(SolicitudModel solicitud) {
         SolicitudResponse response = new SolicitudResponse();
         response.setSolicitudId(solicitud.getId());
-        response.setNitAgricultor(solicitud.getAgricultor().getNitAgricultor());
-        response.setNombreAgricultor(solicitud.getAgricultor().getNombre());
-        response.setPlacaTransporte(solicitud.getTransporte().getPlacaTransporte());
-        response.setTipoTransporte(solicitud.getTransporte().getTipoPlaca() + " - " + solicitud.getTransporte().getMarca());
-        response.setCuiTransportista(solicitud.getTransportista().getCuiTransportista());
-        response.setNombreTransportista(solicitud.getTransportista().getNombreCompleto());
+        response.setNumeroCuenta(solicitud.getNumeroCuenta());
+        response.setNitAgricultor(solicitud.getNitAgricultor());
         response.setPesoAcordado(solicitud.getPesoAcordado());
         response.setCantParcialidades(solicitud.getCantParcialidades());
         response.setPesoCadaParcialidad(solicitud.getPesoCadaParcialidad());

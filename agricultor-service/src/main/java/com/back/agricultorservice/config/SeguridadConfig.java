@@ -25,7 +25,7 @@ public class SeguridadConfig {
                 .authorizeHttpRequests((authorize) ->
                         authorize.requestMatchers(HttpMethod.POST,"/api/solicitudes").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/transportistas").permitAll()
-                                //.requestMatchers("/api/solicitudes/**").permitAll()
+                                .requestMatchers("/api/parcialidades/**").permitAll()
                                 .requestMatchers("/api/transportistas/**").permitAll()
                                 //.requestMatchers(HttpMethod.PUT).permitAll()
                                 //.anyRequest()

@@ -16,37 +16,36 @@ public class TransportistaModel {
     @Column(name = "CuiTransportista", nullable = false)
     private String cuiTransportista;
 
-    @ManyToOne
-    @JoinColumn(name = "NitAgricultor")
-    private TblAgricultorModel agricultor;
+    @Column(name = "NitAgricultor")
+    private String nitAgricultor;
 
     @Column(name = "NombreCompleto", nullable = false)
-    private String NombreCompleto;
+    private String nombreCompleto;
 
     @Column(name = "FechaNacimiento", nullable = false)
-    private LocalDate FechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @Column(name = "TipoLicencia", nullable = true)
-    private String TipoLicencia;
+    private String tipoLicencia;
 
     @Column(name = "FechaVencimientoLicencia", nullable = true)
-    private LocalDate FechaVencimientoLicencia;
+    private LocalDate fechaVencimientoLicencia;
 
     @Column(name = "Activo", nullable = false)
     private boolean activo = true;
 
     @Column(name = "Observaciones", nullable = true)
-    private String Observaciones;
+    private String observaciones;
 
     @Column(name = "FechaCreacion", nullable = true)
-    private LocalDateTime FechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @Column(name = "UsuarioCreacion", nullable = true)
-    private String UsuarioCreacion;
+    private String usuarioCreacion;
 
     @Column(name = "FechaModificacion", nullable = true)
-    private LocalDateTime FechaModificacion;
+    private LocalDateTime fechaModificacion;
 
     @Column(name = "UsuarioModificacion", nullable = true)
-    private String UsuarioModificacion;
+    private String usuarioModificacion;
 }

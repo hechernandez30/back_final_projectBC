@@ -9,35 +9,37 @@ import java.time.LocalDateTime;
 @Data
 @Table(name="solicitud")
 public class SolicitudModel {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SolicitudID")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "NitAgricultor", referencedColumnName = "NitAgricultor")
-    private TblAgricultorModel agricultor;
+    @Column(name = "NumeroCuenta")
+    private int numeroCuenta;
 
-    @ManyToOne
-    @JoinColumn(name = "PlacaTransporte", referencedColumnName = "PlacaTransporte")
-    private TransporteModel transporte;
-
-    @ManyToOne
-    @JoinColumn(name = "CuiTransportista", referencedColumnName = "CuiTransportista")
-    private TransportistaModel transportista;
+    @Column(name = "NitAgricultor")
+    private String nitAgricultor;
 
     private Float pesoAcordado;
+
     private Integer cantParcialidades;
+
     private Float pesoCadaParcialidad;
 
     @ManyToOne
     @JoinColumn(name = "MedidaPesoID", referencedColumnName = "MedidaPesoID")
     private MedidaPesoModel medidaPeso;
+
     private String observaciones;
+
     private String estado;
+
     private LocalDateTime fechaCreacion;
+
     private String usuarioCreacion;
+
     private LocalDateTime fechaModificacion;
+
     private String usuarioModificacion;
 }
+ 

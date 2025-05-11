@@ -5,6 +5,7 @@ import com.spring.security.jwt.filter.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -31,6 +32,13 @@ public class SecurityConfig {
                 .csrf(crf -> crf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                                 .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/estados/**").permitAll()
+                                .requestMatchers("/api/cuentas/**").permitAll()
+                                .requestMatchers("/api/parcialidades/**").permitAll()
+                                .requestMatchers("/api/transportes/**").permitAll()
+                                .requestMatchers("/api/transportistas/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET,"/api/estados/**").permitAll()
+//                                .requestMatchers(HttpMethod.PUT,"/api/estados/**").permitAll()
                                 .anyRequest().authenticated()
                         )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
