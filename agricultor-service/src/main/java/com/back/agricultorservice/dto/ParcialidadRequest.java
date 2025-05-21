@@ -10,11 +10,11 @@ import java.time.LocalDate;
 
 @Data
 public class ParcialidadRequest {
-    private SolicitudModel solicitud;
-    private TransporteModel transporte;
+    private int solicitudId;
+    private String placaTransporte;
     private String nombreTransportista;
-    private TransportistaModel transportista;
-    private MedidaPesoModel medidaPeso;
+    private String cuiTransportista;
+    private int medidaPesoId;
     private LocalDate fechaRecepcionParcialidad;
     private float pesoEnviado;
     private float pesoBascula;

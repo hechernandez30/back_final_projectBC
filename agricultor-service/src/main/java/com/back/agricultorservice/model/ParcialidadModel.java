@@ -13,7 +13,7 @@ public class ParcialidadModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ParcialidadID")
-    private int parcialidad;
+    private int parcialidadId;
 
     @ManyToOne
     @JoinColumn(name = "SolicitudID", referencedColumnName = "SolicitudID")

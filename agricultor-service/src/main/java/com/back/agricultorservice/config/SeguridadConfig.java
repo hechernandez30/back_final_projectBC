@@ -23,10 +23,11 @@ public class SeguridadConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })
                 .authorizeHttpRequests((authorize) ->
-                        authorize.requestMatchers(HttpMethod.POST,"/api/solicitudes").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/transportistas").permitAll()
-                                .requestMatchers("/api/parcialidades/**").permitAll()
+                        authorize.requestMatchers("/api/parcialidades/**").permitAll()
                                 .requestMatchers("/api/transportistas/**").permitAll()
+                                .requestMatchers("/api/medidas/**").permitAll()
+                                .requestMatchers("/api/solicituddes/**").permitAll()
+                                .requestMatchers("/api/transportes/**").permitAll()
                                 //.requestMatchers(HttpMethod.PUT).permitAll()
                                 //.anyRequest()
                                 //.authenticated()

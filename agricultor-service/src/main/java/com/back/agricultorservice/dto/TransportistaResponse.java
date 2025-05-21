@@ -13,4 +13,5 @@ public class TransportistaResponse {
     private String tipoLicencia;
     private LocalDate fechaVencimientoLicencia;
     private String observaciones;
+    private boolean activo = true;
 }

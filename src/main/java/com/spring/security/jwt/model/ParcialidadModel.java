@@ -13,7 +13,7 @@ public class ParcialidadModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ParcialidadID")
     private int parcialidadId;
-    @Column(name = "SolicituudID")
+    @Column(name = "SolicitudID")
     private int solicitudId;
     private String placaTransporte;
     private String nombreTransportista;

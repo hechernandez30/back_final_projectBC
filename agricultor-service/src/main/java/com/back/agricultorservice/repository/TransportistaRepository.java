@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface TransportistaRepository extends JpaRepository<TransportistaModel, String> {
     //Buscar transportistas activos de un agricultor
-    List<TransportistaModel> findByAgricultor_NitAgricultorAndActivoTrue(String nitAgricultor);
+    List<TransportistaModel> findByNitAgricultorAndActivoTrue(String nitAgricultor);
     //Buscar trasnsportista y que este activo
     Optional<TransportistaModel> findByCuiTransportistaAndActivo(String cuiTransportista, boolean activo);
     // Verificar si un CUI existe

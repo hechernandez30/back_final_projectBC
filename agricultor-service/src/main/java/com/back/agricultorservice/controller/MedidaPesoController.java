@@ -10,6 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/medidas")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class MedidaPesoController {
     private final MedidaPesoService medidaPesoService;
 

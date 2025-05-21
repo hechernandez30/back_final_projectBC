@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface CuentaRepository extends JpaRepository<CuentaModel, Integer> {
     List<CuentaModel> findByCuentaId(Integer cuentaId);
-    Optional<CuentaModel> findByNitAgricultor(String nitAgricultor);
+    Optional<CuentaModel> findByNit_Nit(String nitAgricultor);
 }

@@ -15,7 +15,7 @@ public class SolicitudModel {
     private Long id;
 
     @Column(name = "NumeroCuenta")
-    private int numeroCuenta;
+    private Integer numeroCuenta = 0;
 
     @Column(name = "NitAgricultor")
     private String nitAgricultor;

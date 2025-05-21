@@ -37,7 +37,7 @@ public class CuentaService {
         // Crear nueva cuenta
         CuentaModel cuenta = new CuentaModel();
         cuenta.setNumeroCuenta(request.getNumeroCuenta());
-        cuenta.setNitAgricultor(request.getNitAgricultor());
+        cuenta.setNit(request.getNitAgricultor());
         cuenta.setEstadoCuenta(request.getEstadoCuenta());
         cuenta.setPesoAcordado(request.getPesoAcordado());
         cuenta.setCantParcialidades(request.getCantParcialidades());
@@ -85,7 +85,7 @@ public class CuentaService {
 
         // Actualizar campos
         cuenta.setNumeroCuenta(request.getNumeroCuenta());
-        cuenta.setNitAgricultor(request.getNitAgricultor());
+        cuenta.setNit(request.getNitAgricultor());
         cuenta.setEstadoCuenta(request.getEstadoCuenta());
         cuenta.setPesoAcordado(request.getPesoAcordado());
         cuenta.setCantParcialidades(request.getCantParcialidades());
@@ -113,7 +113,7 @@ public class CuentaService {
     private CuentaResponseDto mapToDto(CuentaModel model) {
         CuentaResponseDto dto = new CuentaResponseDto();
         dto.setCuentaId(model.getCuentaId());
-        dto.setNitAgricultor(model.getNitAgricultor());
+        dto.setNitAgricultor(model.getNit());
         dto.setEstadoCuenta(model.getEstadoCuenta().getNombreEstado());
         dto.setPesoAcordado(model.getPesoAcordado());
         dto.setCantParcialidades(model.getCantParcialidades());

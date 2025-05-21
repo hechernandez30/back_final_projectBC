@@ -30,7 +30,7 @@ public class TransportistaAutorizadoService {
         model.setTipoLicencia(request.getTipoLicencia());
         model.setFechaVencimientoLicencia(request.getFechaVencimientoLicencia());
         model.setObservaciones(request.getObservaciones());
-        model.setFechaCreaacion(LocalDate.now());
+        model.setFechaCreacion(LocalDate.now());
         model.setUsuarioCreacion(usuario);
         model.setActivo(true);
 

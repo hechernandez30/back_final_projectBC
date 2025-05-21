@@ -14,37 +14,26 @@ public class TransportistaAutorizadoModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TransportistaAutorizadoID")
     private int transportistaAutorizadoId;
-
     @Column(name = "CuiTransportista")
     private String cuiTransportista;
-
     @Column(name = "NombreCompleto")
     private String nombreCompleto;
-
     @Column(name = "FechaNacimiento")
     private LocalDate fechaNacimiento;
-
     @Column(name = "TipoLicencia")
     private String tipoLicencia;
-
     @Column(name = "FechaVencimientoLicencia")
     private LocalDate fechaVencimientoLicencia;
-
     @Column(name = "Activo")
     private boolean activo = true;
-
     @Column(name = "Observaciones")
     private String observaciones;
-
-    @Column(name = "FechaCreaacion")
-    private LocalDate fechaCreaacion;
-
+    @Column(name = "FechaCreacion")
+    private LocalDate fechaCreacion;
     @Column(name = "UsuarioCreacion")
     private String usuarioCreacion;
-
     @Column(name = "FechaModificacion")
     private LocalDate fechaModificacion;
-
     @Column(name = "UsuarioModificacion")
     private String usuarioModificacion;
 }

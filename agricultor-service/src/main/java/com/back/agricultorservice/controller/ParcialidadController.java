@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/parcialidades")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ParcialidadController {
     private final ParcialidadService parcialidadService;
 

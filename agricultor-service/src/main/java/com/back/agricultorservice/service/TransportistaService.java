@@ -49,6 +49,7 @@ public class TransportistaService {
         response.setTipoLicencia(transportista.getTipoLicencia());
         response.setFechaVencimientoLicencia(transportista.getFechaVencimientoLicencia());
         response.setObservaciones(transportista.getObservaciones());
+        response.setActivo(transportista.isActivo());
         return response;
     }
     // Metodo para obtener un transportista por CUI

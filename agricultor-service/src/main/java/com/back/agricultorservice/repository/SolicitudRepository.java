@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface SolicitudRepository extends JpaRepository<SolicitudModel, Long> {
     //Buscar solicitudes por agricultor (NIT)
-    List<SolicitudModel> findByAgricultor_NitAgricultor(String nitAgricultor);
+    List<SolicitudModel> findByNitAgricultor(String nitAgricultor);
 
     //Buscar solicitudes pendientes (ej: estado = "Pendiente")
     //List<SolicitudModel> findByEstado(String estado);

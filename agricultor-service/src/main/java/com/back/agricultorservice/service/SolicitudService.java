@@ -47,7 +47,7 @@ public class SolicitudService {
     }
     // Metodo para obtener todas las solicitudes de un agricultor
     public List<SolicitudResponse> listarSolicitudesPorAgricultor(String nitAgricultor) {
-        return solicitudRepository.findByAgricultor_NitAgricultor(nitAgricultor)
+        return solicitudRepository.findByNitAgricultor(nitAgricultor)
                 .stream()
                 .map(this::convertirASolicitudResponse)
                 .collect(Collectors.toList());

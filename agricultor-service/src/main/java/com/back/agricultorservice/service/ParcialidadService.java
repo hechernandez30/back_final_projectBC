@@ -24,13 +24,21 @@ public class ParcialidadService {
 
     public ParcialidadResponse crearParcialidad(ParcialidadRequest request, String usuarioCreacion) {
         validarReferencias(request);
+        SolicitudModel solicitud = solicitudRepository.findById((long) request.getSolicitudId())
+                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada."));
+        TransporteModel transporte = transporteRepository.findById(request.getPlacaTransporte())
+                .orElseThrow(() -> new RuntimeException("Transporte no encontrado."));
+        TransportistaModel transportista = transportistaRepository.findById(request.getCuiTransportista())
+                .orElseThrow(() -> new RuntimeException("Transportista no encontrado."));
+        MedidaPesoModel medida = medidaPesoRepository.findById(request.getMedidaPesoId())
+                .orElseThrow(() -> new RuntimeException("Medida de peso no encontrada."));
 
         ParcialidadModel parcialidad = new ParcialidadModel();
-        parcialidad.setSolicitud(request.getSolicitud());
-        parcialidad.setTransporte(request.getTransporte());
+        parcialidad.setSolicitud(solicitud);
+        parcialidad.setTransporte(transporte);
         parcialidad.setNombreTransportista(request.getNombreTransportista());
-        parcialidad.setTransportista(request.getTransportista());
-        parcialidad.setMedidaPeso(request.getMedidaPeso());
+        parcialidad.setTransportista(transportista);
+        parcialidad.setMedidaPeso(medida);
         parcialidad.setFechaRecepcionParcialidad(LocalDateTime.now());
         parcialidad.setPesoEnviado(request.getPesoEnviado());
         parcialidad.setPesoBascula(request.getPesoBascula());
@@ -47,13 +55,22 @@ public class ParcialidadService {
         ParcialidadModel parcialidad = parcialidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Parcialidad no encontrada."));
 
+        SolicitudModel solicitud = solicitudRepository.findById((long) request.getSolicitudId())
+                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada."));
+        TransporteModel transporte = transporteRepository.findById(request.getPlacaTransporte())
+                .orElseThrow(() -> new RuntimeException("Transporte no encontrado."));
+        TransportistaModel transportista = transportistaRepository.findById(request.getCuiTransportista())
+                .orElseThrow(() -> new RuntimeException("Transportista no encontrado."));
+        MedidaPesoModel medida = medidaPesoRepository.findById(request.getMedidaPesoId())
+                .orElseThrow(() -> new RuntimeException("Medida de peso no encontrada."));
+
         validarReferencias(request);
 
-        parcialidad.setSolicitud(request.getSolicitud());
-        parcialidad.setTransporte(request.getTransporte());
+        parcialidad.setSolicitud(solicitud);
+        parcialidad.setTransporte(transporte);
         parcialidad.setNombreTransportista(request.getNombreTransportista());
-        parcialidad.setTransportista(request.getTransportista());
-        parcialidad.setMedidaPeso(request.getMedidaPeso());
+        parcialidad.setTransportista(transportista);
+        parcialidad.setMedidaPeso(medida);
         parcialidad.setFechaRecepcionParcialidad(LocalDateTime.now());
         parcialidad.setPesoEnviado(request.getPesoEnviado());
         parcialidad.setPesoBascula(request.getPesoBascula());
@@ -102,25 +119,30 @@ public class ParcialidadService {
     }
 
     private void validarReferencias(ParcialidadRequest request) {
-        solicitudRepository.findById(request.getSolicitud().getId())
+        solicitudRepository.findById((long) request.getSolicitudId())
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada."));
 
-        TransporteModel transporte = transporteRepository.findById(request.getTransporte().getPlacaTransporte())
-                .orElseThrow(() -> new RuntimeException("Transporte no encontrado."));
-        if (!transporte.isActivo()) throw new RuntimeException("El transporte no está activo.");
+        transporteRepository.findById(request.getPlacaTransporte())
+                .filter(TransporteModel::isActivo)
+                .orElseThrow(() -> new RuntimeException("Transporte no encontrado o inactivo."));
 
-        TransportistaModel transportista = transportistaRepository.findById(request.getTransportista().getCuiTransportista())
-                .orElseThrow(() -> new RuntimeException("Transportista no encontrado."));
-        if (!transportista.isActivo()) throw new RuntimeException("El transportista no está activo.");
+        transportistaRepository.findById(request.getCuiTransportista())
+                .filter(TransportistaModel::isActivo)
+                .orElseThrow(() -> new RuntimeException("Transportista no encontrado o inactivo."));
 
-        MedidaPesoModel medida = medidaPesoRepository.findById(Math.toIntExact(request.getMedidaPeso().getId()))
-                .orElseThrow(() -> new RuntimeException("Medida de peso no encontrada."));
-        if (!medida.isActivo()) throw new RuntimeException("La medida de peso no está activa.");
+        medidaPesoRepository.findById(request.getMedidaPesoId())
+                .filter(MedidaPesoModel::isActivo)
+                .orElseThrow(() -> new RuntimeException("Medida de peso no encontrada o inactiva."));
     }
 
     private ParcialidadResponse mapToResponse(ParcialidadModel model) {
         ParcialidadResponse dto = new ParcialidadResponse();
+
         BeanUtils.copyProperties(model, dto);
+
+        if(model.getTransporte() != null) {
+            dto.setPlacaTransporte(model.getTransporte().getPlacaTransporte());
+        }
         return dto;
     }
 }

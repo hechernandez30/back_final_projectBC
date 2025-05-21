@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/transportes")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class TransporteController {
     private final TransporteService transporteService;
@@ -30,7 +31,7 @@ public class TransporteController {
     @DeleteMapping("/eliminar/{placa}")
     public ResponseEntity<String> eliminarTransporte(@PathVariable String placa) {
         transporteService.eliminarTransporte(placa);
-        return ResponseEntity.ok("Treansporte eliminado (lógicamente) con éxito.");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/listar")

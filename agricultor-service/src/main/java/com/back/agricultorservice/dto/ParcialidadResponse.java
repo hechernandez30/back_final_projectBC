@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class ParcialidadResponse {
     private int parcialidadId;
     private SolicitudModel solicitud;
-    private TransporteModel transporte;
+    private String placaTransporte;
     private String nombreTransportista;
     private TransportistaModel transportista;
     private MedidaPesoModel medidaPeso;

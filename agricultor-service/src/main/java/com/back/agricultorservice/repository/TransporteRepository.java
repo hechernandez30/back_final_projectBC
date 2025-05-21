@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface TransporteRepository extends JpaRepository<TransporteModel, String> {
     //Buscar transportes por agricultor (NIT) y activos
-    List<TransporteModel> findByAgricultor_NitAgricultorAndActivoTrue(String nitAgricultor);
+    List<TransporteModel> findByNitAgricultorAndActivoTrue(String nitAgricultor);
     //Verificar si una placa existe
     boolean existsByPlacaTransporte(String placaTransporte);
     //Listar todos los transportes activos

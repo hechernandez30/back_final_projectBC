@@ -37,6 +37,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/parcialidades/**").permitAll()
                                 .requestMatchers("/api/transportes/**").permitAll()
                                 .requestMatchers("/api/transportistas/**").permitAll()
+                                .requestMatchers("/api/usuarios/**").permitAll()
 //                                .requestMatchers(HttpMethod.GET,"/api/estados/**").permitAll()
 //                                .requestMatchers(HttpMethod.PUT,"/api/estados/**").permitAll()
                                 .anyRequest().authenticated()

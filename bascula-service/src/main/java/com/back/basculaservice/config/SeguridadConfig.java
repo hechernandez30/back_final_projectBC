@@ -25,6 +25,7 @@ public class SeguridadConfig {
                         authorize.requestMatchers("/api/boletas/**").permitAll()
                                 .requestMatchers("/api/parcialidades/**").permitAll()
                                 .requestMatchers("/api/medidas/**").permitAll()
+                                .requestMatchers("/api/cuentas/**").permitAll()
                                 //.requestMatchers(HttpMethod.PUT).permitAll()
                                 //.anyRequest()
                                 //.authenticated()
