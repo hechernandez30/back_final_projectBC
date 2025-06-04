@@ -11,5 +11,7 @@ public class TransporteRequest {
     private String color;
     private String linea;
     private Integer modelo;
+    private boolean disponible;
+    private int pesajeAsociado;
     private String observaciones;
 }

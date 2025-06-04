@@ -1,27 +1,30 @@
 package com.spring.security.jwt.service;
-
 import com.spring.security.jwt.model.UserModel;
-import com.spring.security.jwt.repository.IUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import com.spring.security.jwt.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
+@RequiredArgsConstructor
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    @Autowired
-    private IUserRepository iUserRepository;
+
+    private final UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Call Database to validate
-        UserModel userModel = this.iUserRepository.findByName(username);
-        if(userModel == null) {
-            throw  new UsernameNotFoundException(username);
-        }
-        return new User(userModel.getUsuario(), userModel.getContrasena(), new ArrayList<>()); //Cambiamos getNombre() por getUsuario()
+        UserModel user = userRepository.findByUsuario(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsuario(),
+                user.getContrasena(),
+                Collections.singleton(new SimpleGrantedAuthority(user.getRol()))
+        );
     }
 }

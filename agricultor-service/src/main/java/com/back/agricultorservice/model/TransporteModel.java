@@ -27,6 +27,10 @@ public class TransporteModel {
     private Integer Modelo;
     @Column(name = "Activo", nullable = false)
     private boolean activo = true;
+    @Column(name = "Disponible")
+    private boolean disponible;
+    @Column(name = "PesajeAsociado", nullable = true)
+    private int pesajeAsociado = 0;
     @Column(name = "Observaciones", nullable = true)
     private String Observaciones;
     @Column(name = "FechaCreacion", nullable = true)

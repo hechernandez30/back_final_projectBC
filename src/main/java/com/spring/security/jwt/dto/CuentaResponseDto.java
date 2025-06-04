@@ -9,7 +9,9 @@ public class CuentaResponseDto {
     private int cuentaId;
     private int numeroCuenta;
     private UserModel nitAgricultor;
+    private String nitAgricultorNit;
     private String estadoCuenta;
+    private Integer estadoCuentaId;
     private Float pesoAcordado;
     private Integer cantParcialidades;
     private Float pesoCadaParcialidad;

@@ -5,9 +5,15 @@ import com.spring.security.jwt.dto.CuentaResponseDto;
 import com.spring.security.jwt.model.CuentaModel;
 import com.spring.security.jwt.model.EstadoCuentaModel;
 import com.spring.security.jwt.model.HistorialEstadoCuentaModel;
+import com.spring.security.jwt.model.UserModel;
 import com.spring.security.jwt.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,17 +34,26 @@ public class CuentaService {
             throw new IllegalArgumentException("El nombre del usuario es requerido en el header 'X-Usuario'");
         }
 
-        // Validación: verificar si existe el agricultor
-        boolean agricultorExiste = userRepository.existsByNit(String.valueOf(request.getNitAgricultor()));
-        if (!agricultorExiste) {
+        UserModel agricultor = userRepository.findByNit(request.getNitAgricultor())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un agricultor con el NIT proporcionado: " + request.getNitAgricultor()));
+
+        if (agricultor == null) {
             throw new IllegalArgumentException("No se encontró un agricultor con el NIT proporcionado: " + request.getNitAgricultor());
         }
 
+        EstadoCuentaModel estado = estadoCuentaRepository.findById(request.getEstadoCuentaId())
+                .orElseThrow(() -> new IllegalArgumentException("EstadoCuenta no encontrado"));
+
+        if (usuarioCreacion == null || usuarioCreacion.isBlank()) {
+            throw new IllegalArgumentException("El nombre del usuario es requerido en el header 'X-Usuario'");
+        }
+
+        int nuevoNumero = cuentaRepository.findMaxNumeroCuenta().orElse(0) + 1;
         // Crear nueva cuenta
         CuentaModel cuenta = new CuentaModel();
-        cuenta.setNumeroCuenta(request.getNumeroCuenta());
-        cuenta.setNit(request.getNitAgricultor());
-        cuenta.setEstadoCuenta(request.getEstadoCuenta());
+        cuenta.setNumeroCuenta(nuevoNumero);
+        cuenta.setAgricultor(agricultor);
+        cuenta.setEstadoCuenta(estado);
         cuenta.setPesoAcordado(request.getPesoAcordado());
         cuenta.setCantParcialidades(request.getCantParcialidades());
         cuenta.setPesoCadaParcialidad(request.getPesoCadaParcialidad());
@@ -72,7 +87,7 @@ public class CuentaService {
     }
     // Metodo para modificar una cuenta existente
     public CuentaResponseDto actualizarCuenta(int id, CuentaRequestDto request, String usuarioModificacion) {
-        //Validación: nombre de usuario debe venir en el header
+        // Validación: nombre de usuario debe venir en el header
         if (usuarioModificacion == null || usuarioModificacion.isBlank()) {
             throw new IllegalArgumentException("El nombre del usuario es requerido en el header 'X-Usuario'");
         }
@@ -80,13 +95,22 @@ public class CuentaService {
         CuentaModel cuenta = cuentaRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Cuenta no encontrada"));
 
+        UserModel agricultor = userRepository.findByNit(request.getNitAgricultor())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un agricultor con el NIT proporcionado: " + request.getNitAgricultor()));
+
+        if (agricultor == null) {
+            throw new IllegalArgumentException("No se encontró un agricultor con el NIT proporcionado: " + request.getNitAgricultor());
+        }
+
+        EstadoCuentaModel estadoNuevo = estadoCuentaRepository.findById(request.getEstadoCuentaId())
+                .orElseThrow(() -> new IllegalArgumentException("EstadoCuenta no encontrado"));
+
         EstadoCuentaModel estadoAnterior = cuenta.getEstadoCuenta();
-        EstadoCuentaModel estadoNuevo = request.getEstadoCuenta();
 
         // Actualizar campos
         cuenta.setNumeroCuenta(request.getNumeroCuenta());
-        cuenta.setNit(request.getNitAgricultor());
-        cuenta.setEstadoCuenta(request.getEstadoCuenta());
+        cuenta.setAgricultor(agricultor);
+        cuenta.setEstadoCuenta(estadoNuevo);
         cuenta.setPesoAcordado(request.getPesoAcordado());
         cuenta.setCantParcialidades(request.getCantParcialidades());
         cuenta.setPesoCadaParcialidad(request.getPesoCadaParcialidad());
@@ -97,9 +121,11 @@ public class CuentaService {
         CuentaModel actualizada = cuentaRepository.save(cuenta);
 
         // Si cambió el estado, registrar en historial
-        if (estadoAnterior != null && estadoNuevo != null && estadoAnterior.getEstadoCuentaId() != estadoNuevo.getEstadoCuentaId()) {
+        if (estadoAnterior != null &&
+                !estadoAnterior.getEstadoCuentaId().equals(estadoNuevo.getEstadoCuentaId())) {
+
             HistorialEstadoCuentaModel historial = new HistorialEstadoCuentaModel();
-            historial.setCuentaId(cuenta);
+            historial.setCuentaId(actualizada);
             historial.setEstadoCuentaAnterior(estadoAnterior);
             historial.setEstadoCuentaNuevo(estadoNuevo);
             historial.setUsuarioId(usuarioModificacion);
@@ -107,13 +133,27 @@ public class CuentaService {
             historial.setObservaciones("Cambio automático desde servicio");
             historialEstadoCuentaRepository.save(historial);
         }
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:3001/api/solicitudes/actualizar-estado/" + cuenta.getNumeroCuenta();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> entity = new HttpEntity<>(estadoNuevo.getNombreEstado(), headers);
+            restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+        } catch (Exception ex) {
+            System.err.println("Error al sincronizar el estado con el Agricultor: " + ex.getMessage());
+        }
         return mapToDto(actualizada);
     }
+
     // Metodo para convertir del request al response
     private CuentaResponseDto mapToDto(CuentaModel model) {
         CuentaResponseDto dto = new CuentaResponseDto();
         dto.setCuentaId(model.getCuentaId());
-        dto.setNitAgricultor(model.getNit());
+        dto.setNumeroCuenta(model.getNumeroCuenta());
+        dto.setNitAgricultor(model.getAgricultor());
+        dto.setNitAgricultorNit(model.getAgricultor().getNit());
+        dto.setEstadoCuentaId(model.getEstadoCuenta().getEstadoCuentaId());
         dto.setEstadoCuenta(model.getEstadoCuenta().getNombreEstado());
         dto.setPesoAcordado(model.getPesoAcordado());
         dto.setCantParcialidades(model.getCantParcialidades());
@@ -126,4 +166,10 @@ public class CuentaService {
         dto.setUsuarioModificacion(model.getUsuarioModificacion());
         return dto;
     }
+    public CuentaResponseDto obtenerPorId(int id) {
+        CuentaModel cuenta = cuentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada con ID: " + id));
+        return mapToDto(cuenta); // Usa tu mismo método que usas en listar
+    }
+
 }

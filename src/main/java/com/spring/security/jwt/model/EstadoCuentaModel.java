@@ -12,7 +12,7 @@ public class EstadoCuentaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EstadoCuentaID")
-    private int estadoCuentaId;
+    private Integer estadoCuentaId;
 
     @Column(name = "NombreEstado")
     private String nombreEstado;

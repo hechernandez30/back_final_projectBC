@@ -9,8 +9,8 @@ import java.time.LocalDate;
 @Data
 public class CuentaRequestDto {
     private int numeroCuenta;
-    private UserModel nitAgricultor;
-    private EstadoCuentaModel estadoCuenta;
+    private String nitAgricultor;
+    private Integer estadoCuentaId;
     private Float pesoAcordado;
     private Integer cantParcialidades;
     private Float pesoCadaParcialidad;

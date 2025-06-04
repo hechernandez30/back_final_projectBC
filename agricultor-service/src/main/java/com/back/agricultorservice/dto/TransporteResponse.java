@@ -14,6 +14,8 @@ public class TransporteResponse {
     private String linea;
     private Integer modelo;
     private boolean activo = true;
+//    private boolean disponible;
+//    private int pesajeAsociado;
     private String observaciones;
     private LocalDate fechaCreacion;
     private String usuarioCreacion;

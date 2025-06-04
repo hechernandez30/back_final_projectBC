@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,24 +28,40 @@ public class TransporteService {
     }
 
     @Transactional
-    public TransporteResponse crear(TransporteRequest request, String usuario) {
-        if (transporteRepository.existsById(request.getPlacaTransporte())) {
-            throw new IllegalArgumentException("Ya existe un transporte con esta placa.");
+    public TransporteResponse crear(TransporteRequest request, String usuarioCreacion) {
+        // Extraer el NIT del UserModel
+        if (request.getNitAgricultor() == null || request.getNitAgricultor().getNit() == null) {
+            throw new IllegalArgumentException("El NIT del agricultor es obligatorio.");
         }
 
-        // Validar que el agricultor (usuario) exista por NIT
-        boolean agricultorExiste = userRepository.existsByNit(String.valueOf(request.getNitAgricultor()));
-        if (!agricultorExiste) {
-            throw new IllegalArgumentException("El agricultor con NIT " + request.getNitAgricultor() + " no existe.");
+        String nit = request.getNitAgricultor().getNit();
+
+        UserModel agricultor = userRepository.findByNit(nit)
+                .orElseThrow(() -> new IllegalArgumentException("El agricultor con NIT " + nit + " no existe."));
+
+        // Validar existencia de placa
+        Optional<TransporteModel> existente = transporteRepository.findById(request.getPlacaTransporte());
+        if (existente.isPresent()) {
+            throw new IllegalArgumentException("Ya existe un transporte con esa placa.");
         }
 
-        TransporteModel model = toModel(request);
-        model.setActivo(true);
-        model.setFechaCreacion(LocalDateTime.now());
-        model.setUsuarioCreacion(usuario);
+        TransporteModel transporte = new TransporteModel();
+        transporte.setPlacaTransporte(request.getPlacaTransporte());
+        transporte.setNitAgricultor(agricultor); // ✅ Aquí asignamos un objeto persistido
+        transporte.setTipoPlaca(request.getTipoPlaca());
+        transporte.setMarca(request.getMarca());
+        transporte.setColor(request.getColor());
+        transporte.setLinea(request.getLinea());
+        transporte.setModelo(request.getModelo());
+        transporte.setObservaciones(request.getObservaciones());
+        transporte.setActivo(true);
+        transporte.setFechaCreacion(LocalDateTime.now());
+        transporte.setUsuarioCreacion(usuarioCreacion);
 
-        return toResponse(transporteRepository.save(model));
+        TransporteModel guardado = transporteRepository.save(transporte);
+        return toResponse(guardado);
     }
+
 
     @Transactional
     public TransporteResponse modificar(String placa, TransporteRequest request, String usuario) {

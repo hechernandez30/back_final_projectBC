@@ -35,4 +35,9 @@ public class CuentaController {
             @RequestHeader("X-Usuario") String usuarioModificacion) {
         return ResponseEntity.ok(cuentaService.actualizarCuenta(id, request, usuarioModificacion));
     }
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<CuentaResponseDto> obtenerCuenta(@PathVariable int id) {
+        return ResponseEntity.ok(cuentaService.obtenerPorId(id));
+    }
+
 }

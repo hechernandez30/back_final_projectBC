@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -43,7 +42,8 @@ public class AuthController {
 
             //2. Validar el usuario en la bd
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(authRequestDto.getUser());
-            UserModel userModel = userRepository.findByName(authRequestDto.getUser());
+            UserModel userModel = userRepository.findByUsuario(authRequestDto.getUser())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
             //3. Generar token
             String jwt = this.jwtUtilService.generateToken(userDetails, userModel.getRol());
@@ -68,7 +68,8 @@ public class AuthController {
         try {
             String username = jwtUtilService.extractUsername(refreshToken);
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            UserModel userModel = userRepository.findByName(username);
+            UserModel userModel = userRepository.findByUsuario(username)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
             if(jwtUtilService.validateToken(refreshToken, userDetails)) {
                 String newJwt = jwtUtilService.generateToken(userDetails, userModel.getRol());

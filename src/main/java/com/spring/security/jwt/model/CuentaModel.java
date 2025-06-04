@@ -17,7 +17,7 @@ public class CuentaModel {
     private Integer numeroCuenta = 0;
     @ManyToOne
     @JoinColumn(name = "NitAgricultor", referencedColumnName = "Nit")
-    private UserModel nit;
+    private UserModel agricultor;
     @ManyToOne
     @JoinColumn(name = "EstadoCuentaID", referencedColumnName = "EstadoCuentaID")
     private EstadoCuentaModel estadoCuenta;

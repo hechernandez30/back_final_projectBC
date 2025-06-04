@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SolicitudRepository extends JpaRepository<SolicitudModel, Long> {
@@ -19,4 +20,6 @@ public interface SolicitudRepository extends JpaRepository<SolicitudModel, Long>
     //long countByAgricultor_NitAgricultorAndEstado(String nitAgricultor, String estado);
     //Listar todas las solicitudes
     List<SolicitudModel> findAll();
+
+    Optional<SolicitudModel> findByNumeroCuenta(int numeroCuenta);
 }
