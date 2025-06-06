@@ -9,11 +9,13 @@ import java.time.LocalDate;
 public class TransportistaAutorizadoResponseDto {
     private int transportistaAutorizadoId;
     private String cuiTransportista;
+    private String nitAgricultor;
     private String nombreCompleto;
     private LocalDate fechaNacimiento;
     private String tipoLicencia;
     private LocalDate fechaVencimientoLicencia;
     private boolean activo;
+    private boolean disponible;
     private String observaciones;
     private LocalDate fechaCreaacion;
     private String usuarioCreacion;

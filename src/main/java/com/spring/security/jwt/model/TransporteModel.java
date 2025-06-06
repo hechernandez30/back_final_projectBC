@@ -15,18 +15,22 @@ public class TransporteModel {
     @ManyToOne
     @JoinColumn(name = "NitAgricultor", referencedColumnName = "Nit")
     private UserModel nitAgricultor;
-    @Column(name = "TipoPlaca", nullable = false)
+    @Column(name = "TipoPlaca", nullable = true)
     private String TipoPlaca;
-    @Column(name = "Marca", nullable = false)
+    @Column(name = "Marca", nullable = true)
     private String Marca;
-    @Column(name = "Color", nullable = false)
+    @Column(name = "Color", nullable = true)
     private String Color;
-    @Column(name = "Linea", nullable = false)
+    @Column(name = "Linea", nullable = true)
     private String Linea;
     @Column(name = "Modelo", nullable = true)
     private Integer Modelo;
-    @Column(name = "Activo", nullable = false)
+    @Column(name = "Activo", nullable = true)
     private boolean activo = true;
+    @Column(name = "Disponible")
+    private boolean disponible = true;
+//    @Column(name = "Pesaje Asociado")
+//    private int pesajeAsociado = 0;
     @Column(name = "Observaciones", nullable = true)
     private String Observaciones;
     @Column(name = "FechaCreacion", nullable = true)

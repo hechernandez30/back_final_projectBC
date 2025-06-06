@@ -4,9 +4,15 @@ import com.back.agricultorservice.dto.TransportistaRequest;
 import com.back.agricultorservice.dto.TransportistaResponse;
 import com.back.agricultorservice.model.TransportistaModel;
 import com.back.agricultorservice.repository.TransportistaRepository;
+import com.spring.security.jwt.dto.TransportistaAutorizadoRequestDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,9 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransportistaService {
     private final TransportistaRepository transportistaRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
     @Transactional
-    public TransportistaResponse crearTransportista(TransportistaRequest request, String usuarioCreacion){
-        //Validar que no se registren CUI duplicados de transportistaas
+    public TransportistaResponse crearTransportista(TransportistaRequest request, String usuarioCreacion) {
+        // Validar que no se registren CUI duplicados
         transportistaRepository.findById(request.getCuiTransportista()).ifPresent(existing -> {
             if (existing.isActivo()) {
                 throw new IllegalArgumentException("Ya existe un transportista activo con ese CUI.");
@@ -25,7 +34,14 @@ public class TransportistaService {
                 throw new IllegalArgumentException("El CUI ingresado ya está registrado pero el transportista está inactivo.");
             }
         });
-        //Crear el transportista
+
+        // 🌐 Primero crear en Beneficio
+        boolean creadoEnBeneficio = enviarABeneficio(request, usuarioCreacion);
+        if (!creadoEnBeneficio) {
+            throw new RuntimeException("No se pudo registrar el transportista en el módulo Beneficio.");
+        }
+
+        // 📝 Si Beneficio fue exitoso, creamos en Agricultor
         TransportistaModel transportista = new TransportistaModel();
         transportista.setCuiTransportista(request.getCuiTransportista());
         transportista.setNitAgricultor(request.getNitAgricultor());
@@ -36,9 +52,11 @@ public class TransportistaService {
         transportista.setObservaciones(request.getObservaciones());
         transportista.setFechaCreacion(LocalDateTime.now());
         transportista.setUsuarioCreacion(usuarioCreacion);
-        TransportistaModel transportistaGuardada = transportistaRepository.save(transportista);
-        return convertirATransportistaResponse(transportistaGuardada);
+
+        TransportistaModel transportistaGuardado = transportistaRepository.save(transportista);
+        return convertirATransportistaResponse(transportistaGuardado);
     }
+
     //Convertir usando DTO
     private TransportistaResponse convertirATransportistaResponse(TransportistaModel transportista) {
         TransportistaResponse response = new TransportistaResponse();
@@ -52,6 +70,36 @@ public class TransportistaService {
         response.setActivo(transportista.isActivo());
         return response;
     }
+
+    private boolean enviarABeneficio(TransportistaRequest request, String usuarioCreacion) {
+        try {
+            String url = "http://localhost:3000/api/transportistas/crear";
+
+            TransportistaAutorizadoRequestDto dto = new TransportistaAutorizadoRequestDto();
+            dto.setCuiTransportista(request.getCuiTransportista());
+            dto.setNitAgricultor(request.getNitAgricultor());
+            dto.setNombreCompleto(request.getNombreCompleto());
+            dto.setFechaNacimiento(request.getFechaNacimiento());
+            dto.setTipoLicencia(request.getTipoLicencia());
+            dto.setFechaVencimientoLicencia(request.getFechaVencimientoLicencia());
+            dto.setObservaciones(request.getObservaciones());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-Usuario", usuarioCreacion != null ? usuarioCreacion : "sistema");
+
+            HttpEntity<TransportistaAutorizadoRequestDto> entity = new HttpEntity<>(dto, headers);
+
+            restTemplate.postForEntity(url, entity, Void.class);
+            return true;
+        } catch (Exception ex) {
+            // Puedes loguear el error si quieres ver el detalle
+            System.err.println("Error al sincronizar con Beneficio: " + ex.getMessage());
+            return false;
+        }
+    }
+
+
     // Metodo para obtener un transportista por CUI
     public TransportistaResponse obtenerTransportistaPorCui(String cui) {
         TransportistaModel transportista = transportistaRepository.findById(cui)

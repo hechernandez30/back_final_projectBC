@@ -42,6 +42,11 @@ public class TransportistaAutorizadoController {
         return ResponseEntity.ok(service.modificar(id, request, usuario));
     }
 
+    @GetMapping("/buscar-id/{id}")
+    public ResponseEntity<TransportistaAutorizadoResponseDto> buscarPorId(@PathVariable int id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminarLogico(
             @PathVariable int id,

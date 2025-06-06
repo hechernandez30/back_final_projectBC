@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -72,13 +73,18 @@ public class TransporteService {
             throw new IllegalStateException("No se puede modificar un transporte inactivo.");
         }
 
-        model.setPlacaTransporte(request.getPlacaTransporte());
-        model.setNitAgricultor(request.getNitAgricultor());
-        model.setTipoPlaca(request.getTipoPlaca());
-        model.setMarca(request.getMarca());
-        model.setColor(request.getColor());
-        model.setLinea(request.getLinea());
-        model.setModelo(request.getModelo());
+        if(request.getObservaciones() != null) {
+            model.setObservaciones(request.getObservaciones());
+        }
+
+        //model.setPlacaTransporte(request.getPlacaTransporte());
+        //model.setNitAgricultor(request.getNitAgricultor());
+        //model.setTipoPlaca(request.getTipoPlaca());
+        //model.setMarca(request.getMarca());
+        //model.setColor(request.getColor());
+        //model.setLinea(request.getLinea());
+        //model.setModelo(request.getModelo());
+        model.setDisponible(request.isDisponible());
         model.setObservaciones(request.getObservaciones());
         model.setFechaModificacion(LocalDateTime.now());
         model.setUsuarioModificacion(usuario);
@@ -108,6 +114,7 @@ public class TransporteService {
         dto.setLinea(model.getLinea());
         dto.setModelo(model.getModelo());
         dto.setActivo(model.isActivo());
+        dto.setDisponible(model.isDisponible());
         dto.setObservaciones(model.getObservaciones());
         dto.setFechaCreacion(model.getFechaCreacion());
         dto.setUsuarioCreacion(model.getUsuarioCreacion());
@@ -128,4 +135,11 @@ public class TransporteService {
         model.setObservaciones(request.getObservaciones());
         return model;
     }
+
+    public TransporteResponse obtenerPorPlaca(String placa) {
+        TransporteModel transporte = transporteRepository.findById(placa)
+                .orElseThrow(() -> new NoSuchElementException("Transporte no encontrado con placa: " + placa));
+        return toResponse(transporte);
+    }
+
 }

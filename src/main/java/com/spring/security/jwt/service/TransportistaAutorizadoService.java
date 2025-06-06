@@ -25,6 +25,7 @@ public class TransportistaAutorizadoService {
 
         TransportistaAutorizadoModel model = new TransportistaAutorizadoModel();
         model.setCuiTransportista(request.getCuiTransportista());
+        model.setNitAgricultor(request.getNitAgricultor());
         model.setNombreCompleto(request.getNombreCompleto());
         model.setFechaNacimiento(request.getFechaNacimiento());
         model.setTipoLicencia(request.getTipoLicencia());
@@ -58,6 +59,7 @@ public class TransportistaAutorizadoService {
         model.setFechaNacimiento(request.getFechaNacimiento());
         model.setTipoLicencia(request.getTipoLicencia());
         model.setFechaVencimientoLicencia(request.getFechaVencimientoLicencia());
+        model.setDisponible(request.isDisponible());
         model.setObservaciones(request.getObservaciones());
         model.setFechaModificacion(LocalDate.now());
         model.setUsuarioModificacion(usuario);
@@ -82,4 +84,9 @@ public class TransportistaAutorizadoService {
         return dto;
     }
 
+    public TransportistaAutorizadoResponseDto buscarPorId(int id) {
+        TransportistaAutorizadoModel model = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transportista no encontrado"));
+        return toDto(model);
+    }
 }

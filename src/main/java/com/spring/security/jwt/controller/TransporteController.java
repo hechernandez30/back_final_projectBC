@@ -40,4 +40,10 @@ public class TransporteController {
         transporteService.eliminar(placa, usuario);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{placa}")
+    public ResponseEntity<TransporteResponse> obtenerPorPlaca(@PathVariable String placa) {
+        return ResponseEntity.ok(transporteService.obtenerPorPlaca(placa));
+    }
+
 }

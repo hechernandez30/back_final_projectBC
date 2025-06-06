@@ -16,6 +16,8 @@ public class TransportistaAutorizadoModel {
     private int transportistaAutorizadoId;
     @Column(name = "CuiTransportista")
     private String cuiTransportista;
+    @Column(name = "NitAgricultor")
+    private String nitAgricultor;
     @Column(name = "NombreCompleto")
     private String nombreCompleto;
     @Column(name = "FechaNacimiento")
@@ -26,6 +28,8 @@ public class TransportistaAutorizadoModel {
     private LocalDate fechaVencimientoLicencia;
     @Column(name = "Activo")
     private boolean activo = true;
+    @Column(name = "Disponible")
+    private boolean disponible = true;
     @Column(name = "Observaciones")
     private String observaciones;
     @Column(name = "FechaCreacion")

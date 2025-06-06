@@ -15,4 +15,5 @@ public class TransporteRequest {
     private String Linea;
     private Integer Modelo;
     private String Observaciones;
+    private boolean disponible;
 }
