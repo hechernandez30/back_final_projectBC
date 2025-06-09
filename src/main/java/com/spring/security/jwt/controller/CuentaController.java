@@ -1,5 +1,6 @@
 package com.spring.security.jwt.controller;
 
+import com.spring.security.jwt.dto.CuentaEstadoRequest;
 import com.spring.security.jwt.dto.CuentaRequestDto;
 import com.spring.security.jwt.dto.CuentaResponseDto;
 import com.spring.security.jwt.service.CuentaService;
@@ -35,6 +36,17 @@ public class CuentaController {
             @RequestHeader("X-Usuario") String usuarioModificacion) {
         return ResponseEntity.ok(cuentaService.actualizarCuenta(id, request, usuarioModificacion));
     }
+
+    @PutMapping("/actualizar-estado/{id}")
+    public ResponseEntity<CuentaResponseDto> actualizarEstado(
+            @PathVariable int id,
+            @RequestBody CuentaEstadoRequest request,
+            @RequestHeader("X-Usuario") String usuario) {
+
+        return ResponseEntity.ok(cuentaService.actualizarEstado(id, request, usuario));
+    }
+
+
     @GetMapping("/buscar/{id}")
     public ResponseEntity<CuentaResponseDto> obtenerCuenta(@PathVariable int id) {
         return ResponseEntity.ok(cuentaService.obtenerPorId(id));

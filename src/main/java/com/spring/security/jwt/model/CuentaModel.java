@@ -25,6 +25,10 @@ public class CuentaModel {
     private Float pesoAcordado;
     @Column(name = "CantParcialidades")
     private Integer cantParcialidades;
+    @Column(name = "DiferenciaTotal")
+    private Float diferenciaTotal;
+    @Column(name = "Tolerancia")
+    private String tolerancia;
     @Column(name = "PesoCadaParcialidad")
     private Float pesoCadaParcialidad;
     @Column(name = "MedidaPeso")

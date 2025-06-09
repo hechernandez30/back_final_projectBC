@@ -14,6 +14,8 @@ public class CuentaResponseDto {
     private Integer estadoCuentaId;
     private Float pesoAcordado;
     private Integer cantParcialidades;
+    private Float diferenciaTotal;
+    private String tolerancia;
     private Float pesoCadaParcialidad;
     private String medidaPeso;
     private String observaciones;

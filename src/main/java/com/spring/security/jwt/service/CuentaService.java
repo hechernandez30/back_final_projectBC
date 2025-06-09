@@ -1,5 +1,6 @@
 package com.spring.security.jwt.service;
 
+import com.spring.security.jwt.dto.CuentaEstadoRequest;
 import com.spring.security.jwt.dto.CuentaRequestDto;
 import com.spring.security.jwt.dto.CuentaResponseDto;
 import com.spring.security.jwt.model.CuentaModel;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -149,12 +151,26 @@ public class CuentaService {
     // Metodo para convertir del request al response
     private CuentaResponseDto mapToDto(CuentaModel model) {
         CuentaResponseDto dto = new CuentaResponseDto();
+
         dto.setCuentaId(model.getCuentaId());
         dto.setNumeroCuenta(model.getNumeroCuenta());
-        dto.setNitAgricultor(model.getAgricultor());
-        dto.setNitAgricultorNit(model.getAgricultor().getNit());
-        dto.setEstadoCuentaId(model.getEstadoCuenta().getEstadoCuentaId());
-        dto.setEstadoCuenta(model.getEstadoCuenta().getNombreEstado());
+
+        if (model.getAgricultor() != null) {
+            dto.setNitAgricultor(model.getAgricultor());
+            dto.setNitAgricultorNit(model.getAgricultor().getNit());
+        } else {
+            dto.setNitAgricultor(null);
+            dto.setNitAgricultorNit(null);
+        }
+
+        if (model.getEstadoCuenta() != null) {
+            dto.setEstadoCuentaId(model.getEstadoCuenta().getEstadoCuentaId());
+            dto.setEstadoCuenta(model.getEstadoCuenta().getNombreEstado());
+        } else {
+            dto.setEstadoCuentaId(null);
+            dto.setEstadoCuenta(null);
+        }
+
         dto.setPesoAcordado(model.getPesoAcordado());
         dto.setCantParcialidades(model.getCantParcialidades());
         dto.setPesoCadaParcialidad(model.getPesoCadaParcialidad());
@@ -164,12 +180,34 @@ public class CuentaService {
         dto.setUsuarioCreacion(model.getUsuarioCreacion());
         dto.setFechaModificacion(model.getFechaModificacion());
         dto.setUsuarioModificacion(model.getUsuarioModificacion());
+
         return dto;
     }
+
     public CuentaResponseDto obtenerPorId(int id) {
         CuentaModel cuenta = cuentaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada con ID: " + id));
         return mapToDto(cuenta); // Usa tu mismo método que usas en listar
     }
+
+    public CuentaResponseDto actualizarEstado(int id, CuentaEstadoRequest request, String usuario) {
+        CuentaModel model = cuentaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la cuenta con id: " + id));
+
+        // Construimos un EstadoCuentaModel solo con el ID
+        EstadoCuentaModel estadoCuenta = new EstadoCuentaModel();
+        estadoCuenta.setEstadoCuentaId(request.getEstadoCuentaId());
+        model.setEstadoCuenta(estadoCuenta);
+
+        // Actualizamos metadatos
+        model.setFechaModificacion(LocalDate.now());
+        model.setUsuarioModificacion(usuario);
+
+        CuentaModel actualizado = cuentaRepository.save(model);
+
+        return mapToDto(actualizado);
+    }
+
+
 
 }

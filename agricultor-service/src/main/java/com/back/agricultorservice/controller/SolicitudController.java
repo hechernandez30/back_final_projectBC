@@ -48,6 +48,17 @@ public class SolicitudController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/actualizar-estados/{id}")
+    public ResponseEntity<SolicitudResponse> actualizarEstado(
+            @PathVariable int id,
+            @RequestBody String nuevoEstado,
+            @RequestHeader("X-Usuario") String usuarioModificacion) {
+
+        SolicitudResponse response = solicitudService.actualizarEstado(id, nuevoEstado, usuarioModificacion);
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/{id}")
     public SolicitudResponse obtenerPorId(@PathVariable Long id){
         return solicitudService.obtenerSolicitudPorId(id);

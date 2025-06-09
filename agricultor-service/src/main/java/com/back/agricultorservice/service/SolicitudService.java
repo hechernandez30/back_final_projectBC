@@ -40,7 +40,7 @@ public class SolicitudService {
             throw new IllegalArgumentException("El peso acordado no coincide con el cálculo de parcialidades");
         }
 
-        // 3. Crear y guardar la solicitud localmente con numeroCuenta temporal (0)
+        // 3. Construir la solicitud LOCAL, pero NO guardar aún
         SolicitudModel solicitud = new SolicitudModel();
         solicitud.setNumeroCuenta(0); // Temporal
         solicitud.setNitAgricultor(request.getNitAgricultor());
@@ -49,13 +49,11 @@ public class SolicitudService {
         solicitud.setCantParcialidades(request.getCantParcialidades());
         solicitud.setPesoCadaParcialidad(request.getPesoCadaParcialidad());
         solicitud.setObservaciones(request.getObservaciones());
-        solicitud.setEstado("Cuenta Creada"); // Ya que lo decidiste como default
+        solicitud.setEstado("Cuenta Creada"); // Default
         solicitud.setFechaCreacion(LocalDateTime.now());
         solicitud.setUsuarioCreacion(usuarioCreacion);
 
-        SolicitudModel solicitudGuardada = solicitudRepository.save(solicitud);
-
-        // 4. Enviar al microservicio de beneficio y recibir el número de cuenta generado
+        // 4. Primero intentamos enviar al microservicio de beneficio:
         try {
             CuentaRequestDto cuenta = SolicitudMapper.convertirASolicitudBeneficio(request);
             HttpHeaders headers = new HttpHeaders();
@@ -63,27 +61,34 @@ public class SolicitudService {
             headers.set("X-Usuario", usuarioCreacion);
 
             HttpEntity<CuentaRequestDto> entity = new HttpEntity<>(cuenta, headers);
-            //ResponseEntity<CuentaResponseDto> response = restTemplate.postForEntity(
+
             ResponseEntity<CuentaResponseDto> response = restTemplate.exchange(
                     "http://localhost:3000/api/cuentas",
                     HttpMethod.POST,
                     entity,
                     CuentaResponseDto.class);
 
-            // 5. Sincronizar número de cuenta si fue retornado
+            // 5. Si la llamada fue exitosa:
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 int numeroGenerado = response.getBody().getNumeroCuenta();
-                solicitudGuardada.setNumeroCuenta(numeroGenerado);
-                //solicitudRepository.save(solicitudGuardada); // Guardar actualización
+                solicitud.setNumeroCuenta(numeroGenerado);
+
+                // Ahora sí → guardar en Agricultor
+                SolicitudModel solicitudGuardada = solicitudRepository.save(solicitud);
+
+                System.out.println("✅ Cuenta creada y número sincronizado desde Beneficio.");
+
+                return convertirASolicitudResponse(solicitudGuardada);
+            } else {
+                throw new RuntimeException("Error al crear cuenta en el módulo Beneficio.");
             }
 
-            System.out.println("✅ Cuenta creada y número sincronizado desde Beneficio.");
         } catch (Exception e) {
-            System.out.println("❌ Error al enviar cuenta al microservicio beneficio: " + e.getMessage());
+            // Si falla → NO guardar nada en Agricultor
+            throw new RuntimeException("❌ Error al enviar cuenta al microservicio beneficio: " + e.getMessage());
         }
-
-        return convertirASolicitudResponse(solicitudGuardada);
     }
+
 
 
     // Metodo para obtener todas las solicitudes de un agricultor
@@ -129,5 +134,19 @@ public class SolicitudService {
         solicitud.setUsuarioModificacion("SINCRONIZADO");
         solicitudRepository.save(solicitud);
     }
+
+    public SolicitudResponse actualizarEstado(int id, String nuevoEstado, String usuarioModificacion) {
+        SolicitudModel solicitud = solicitudRepository.findById((long) id)
+                .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada con ID: " + id));
+
+        solicitud.setEstado(nuevoEstado);
+        solicitud.setUsuarioModificacion(usuarioModificacion);
+        solicitud.setFechaModificacion(LocalDateTime.now());
+
+        SolicitudModel actualizada = solicitudRepository.save(solicitud);
+
+        return convertirASolicitudResponse(actualizada);
+    }
+
 
 }

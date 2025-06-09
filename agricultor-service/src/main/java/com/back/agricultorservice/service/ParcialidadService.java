@@ -4,9 +4,14 @@ import com.back.agricultorservice.dto.ParcialidadRequest;
 import com.back.agricultorservice.dto.ParcialidadResponse;
 import com.back.agricultorservice.model.*;
 import com.back.agricultorservice.repository.*;
+import com.spring.security.jwt.dto.ParcialidadRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +29,7 @@ public class ParcialidadService {
 
     public ParcialidadResponse crearParcialidad(ParcialidadRequest request, String usuarioCreacion) {
         validarReferencias(request);
+
         SolicitudModel solicitud = solicitudRepository.findById((long) request.getSolicitudId())
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada."));
         TransporteModel transporte = transporteRepository.findById(request.getPlacaTransporte())
@@ -48,8 +54,48 @@ public class ParcialidadService {
         parcialidad.setActivo(true);
         parcialidad.setObservaciones(request.getObservaciones());
 
-        return mapToResponse(parcialidadRepository.save(parcialidad));
+        ParcialidadModel guardada;
+
+        // SINCRONIZACIÓN CON BENEFICIO:
+        try {
+            // 1. Primero intentamos enviar al Beneficio
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:3000/api/parcialidades/crear";
+
+            // Construir el DTO que espera el Beneficio:
+            ParcialidadRequestDto requestDto = new ParcialidadRequestDto();
+            requestDto.setSolicitudId(request.getSolicitudId());
+            requestDto.setPlacaTransporte(request.getPlacaTransporte());
+            requestDto.setNombreTransportista(request.getNombreTransportista());
+            requestDto.setCuiTransportista(request.getCuiTransportista());
+            requestDto.setMedidaPesoId(request.getMedidaPesoId());
+            requestDto.setFechaRecepcionParcialidad(request.getFechaRecepcionParcialidad());
+            requestDto.setPesoEnviado(request.getPesoEnviado());
+            requestDto.setPesoBascula(request.getPesoBascula());
+            requestDto.setDiferenciaPeso(request.getDiferenciaPeso());
+            requestDto.setFechaPesoBascula(request.getFechaPesoBascula());
+            requestDto.setObservaciones(request.getObservaciones());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-Usuario", usuarioCreacion);
+
+            HttpEntity<ParcialidadRequestDto> entity = new HttpEntity<>(requestDto, headers);
+
+            restTemplate.postForEntity(url, entity, Void.class);
+
+            // Si llegó aquí → sincronización OK → guardamos en Agricultor:
+            guardada = parcialidadRepository.save(parcialidad);
+
+        } catch (Exception ex) {
+            // Si la sincronización falla → NO guardamos nada y lanzamos error:
+            throw new RuntimeException("Error al sincronizar la parcialidad con el módulo Beneficio: " + ex.getMessage());
+        }
+
+        // Devolver la response local:
+        return mapToResponse(guardada);
     }
+
 
     public void actualizarParcialidad(int id, ParcialidadRequest request, String usuarioModificacion) {
         ParcialidadModel parcialidad = parcialidadRepository.findById(id)

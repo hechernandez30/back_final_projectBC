@@ -55,10 +55,11 @@ public class TransportistaAutorizadoService {
         TransportistaAutorizadoModel model = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Transportista no encontrado con ID: " + id));
 
-        model.setNombreCompleto(request.getNombreCompleto());
-        model.setFechaNacimiento(request.getFechaNacimiento());
-        model.setTipoLicencia(request.getTipoLicencia());
-        model.setFechaVencimientoLicencia(request.getFechaVencimientoLicencia());
+//        model.setNombreCompleto(request.getNombreCompleto());
+//        model.setFechaNacimiento(request.getFechaNacimiento());
+//        model.setTipoLicencia(request.getTipoLicencia());
+//        model.setFechaVencimientoLicencia(request.getFechaVencimientoLicencia());
+
         model.setDisponible(request.isDisponible());
         model.setObservaciones(request.getObservaciones());
         model.setFechaModificacion(LocalDate.now());
